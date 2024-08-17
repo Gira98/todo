@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Component } from 'react'
 
 import TaskList from './task-list'
 import Footer from './footer'
@@ -6,14 +6,96 @@ import NewTaskForm from './new-task-form'
 
 import './todo.css'
 
-function Todo() {
-  return (
+export default class Todo extends Component {
+  maxId = 100
+
+  state = {
+    todoData: [
+      this.createTodoItem('Eat well'),
+      this.createTodoItem('Study'),
+      this.createTodoItem('Gym')
+    ],
+    activeFilter: 'all'
+  }
+  createTodoItem(label) {
+    return {
+        label,
+        id: this.maxId++,
+        done: false
+      }
+  }
+  addItem = (text) => {
+    const newItem = this.createTodoItem(text)
+    this.setState(({todoData}) => {
+      const newArr = [
+        ...todoData,
+        newItem
+      ]
+      return {
+        todoData: newArr
+      }
+    })
+  }
+  deleteItem = (id) => {
+    this.setState(({ todoData }) => {
+      const idx = todoData.findIndex( el => (id === el.id))
+      return {
+        todoData: todoData.toSpliced(idx, 1)
+      }
+    })
+  }
+  onEdit = (id, label) => {
+    this.setState(({todoData}) => {
+      const newAr = todoData.map(el => {
+        if (el.id === id) return this.createTodoItem(label)
+        else return el
+      })
+      return {
+        todoData: newAr
+      }
+    })
+  }
+  onToggleDone = (id) => {
+    this.setState(({ todoData }) => {
+      const newTodoData = todoData.map((item) => {
+        if (id === item.id) {
+          return { ...item, done: !item.done }
+        }
+
+        return item
+      })
+      return { todoData: newTodoData }
+    })
+  }
+  onFiltered = (button) => {
+    this.setState({ activeFilter: button})
+  }
+  getFilteredData = (todoData, activeFilter) => {
+    if (activeFilter === 'all') return todoData
+    if (activeFilter === 'active') return todoData.filter((item) => !item.done)
+    if (activeFilter === 'completed') return todoData.filter((item) => item.done)
+    return todoData
+  }
+  onClearCompleted = () => {
+    this.setState(({todoData}) => {
+      const clearedAr = todoData.map(el => {
+      if (el.done) this.deleteItem(el.id)
+      return el
+    })
+    return {
+      todoData: clearedAr
+    }
+    })
+  }
+  render() {
+    const { todoData, activeFilter } = this.state
+    const todoLeftCount = todoData.length - todoData.filter(el => el.done).length
+    return (
     <div className="main">
-      <NewTaskForm />
-      <TaskList />
-      <Footer />
+      <NewTaskForm onItemAdded={this.addItem} />
+      <TaskList todos={this.getFilteredData(todoData, activeFilter)} onEdit={this.onEdit} onToggleDone={this.onToggleDone} onDelete={this.deleteItem}/>
+      <Footer todoLeftCount={todoLeftCount} onClearCompleted={this.onClearCompleted} activeFilter={activeFilter} onFiltered={this.onFiltered}/>
     </div>
   )
+  }
 }
-
-export default Todo
