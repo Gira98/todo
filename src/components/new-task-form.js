@@ -1,11 +1,13 @@
-import React, { Component } from 'react'
+import { Component } from 'react'
+import PropTypes from 'prop-types'
 
 import './new-task-form.css'
 
 export default class NewTaskForm extends Component {
-  state = {
-    label: '',
-  }
+  constructor(props) {
+    super(props);
+    this.state = {label: ''};
+}
 
   onLabelChange = (e) => {
     this.setState({
@@ -14,9 +16,11 @@ export default class NewTaskForm extends Component {
   }
 
   onSubmit = (e) => {
+    const { label } = this.state
+    const { onItemAdded } = this.props
     e.preventDefault()
-    if (!(this.state.label === '')) {
-      this.props.onItemAdded(this.state.label)
+    if (!( label === '')) {
+      onItemAdded(label)
       this.setState({
         label: '',
       })
@@ -24,6 +28,7 @@ export default class NewTaskForm extends Component {
   }
 
   render() {
+    const { label } = this.state
     return (
       <form className="todoapp" onSubmit={this.onSubmit}>
         <header className="header">
@@ -33,10 +38,14 @@ export default class NewTaskForm extends Component {
             className="new-todo"
             placeholder="What needs to be done?"
             onChange={this.onLabelChange}
-            value={this.state.label}
+            value={label}
           />
         </header>
       </form>
     )
   }
+}
+
+NewTaskForm.propTypes = {
+  onItemAdded: PropTypes.func.isRequired,
 }

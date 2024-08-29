@@ -11,6 +11,7 @@
     "react-dom": "^18.3.1",
     "react-scripts": "5.0.1",
     "sass": "^1.75.0",
+    "date-fns": "^3.6.0",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
@@ -44,6 +45,7 @@
     "@babel/core": "^7.25.2",
     "@babel/eslint-parser": "^7.25.1",
     "@babel/plugin-transform-private-property-in-object": "^7.24.7",
+   
     "eslint": "^8.57.0",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-prettier": "^9.1.0",
