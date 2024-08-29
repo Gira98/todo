@@ -1,6 +1,6 @@
 import ReactDOM from 'react-dom/client'
 
-import Todo from './components/todo'
+import Todo from './components/todo/todo'
 
 function App() {
   return (

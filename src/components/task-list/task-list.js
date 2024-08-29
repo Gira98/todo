@@ -2,7 +2,7 @@
 
 import PropTypes from 'prop-types'
 
-import Task from './task'
+import Task from '../task/task'
 import './task-list.css'
 
 export default function TaskList({ todos, onToggleDone, onDelete, onEdit }) {

@@ -1,3 +1,7 @@
+/* eslint-disable jsx-a11y/label-has-associated-control */
+/* eslint-disable jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions */
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+
 import { Component } from 'react'
 import PropTypes from 'prop-types'
 import './task.css'
@@ -7,15 +11,17 @@ import { formatDistanceToNowStrict } from 'date-fns'
 export default class Task extends Component {
   constructor(props) {
     super(props)
+    const { label } = this.props
     this.state = {
       isEditing: false,
-      inputText: this.props.label,
+      inputText: label,
     }
   }
 
   onEditHandle = () => {
+    const { isEditing } = this.state
     this.setState({
-      isEditing: !this.state.isEditing,
+      isEditing: !isEditing,
     })
   }
 
@@ -26,10 +32,10 @@ export default class Task extends Component {
   }
 
   onEnterPress = (e) => {
-    const { onEdit } = this.props
+    const { onEdit, id } = this.props
 
     if (e.key === 'Enter' && e.target.value !== '' && e.target.value !== ' ') {
-      onEdit(this.props.id, e.target.value)
+      onEdit(id, e.target.value)
 
       this.setState({
         isEditing: false,
@@ -49,9 +55,14 @@ export default class Task extends Component {
         value={inputText}
       />
     )
+    const liClassForm = () => {
+      if (isEditing) return 'editing'
+      if (done) return 'completed'
+      return ''
+    }
 
     return (
-      <li className={done ? 'completed' : isEditing ? 'editing' : ''}>
+      <li className={liClassForm()}>
         <div className="view">
           <input className="toggle" type="checkbox" checked={done} onChange={() => onToggleDone(id)} />
           <label>
@@ -62,8 +73,8 @@ export default class Task extends Component {
               created {formatDistanceToNowStrict(created, { includeSeconds: true, addSuffix: true })}
             </span>
           </label>
-          <button className="icon icon-edit" onClick={() => this.onEditHandle(id)} />
-          <button className="icon icon-destroy" onClick={() => onDelete(id)} />
+          <button type='button' className="icon icon-edit" onClick={() => this.onEditHandle(id)} />
+          <button type='button' className="icon icon-destroy" onClick={() => onDelete(id)} />
         </div>
         {isEditing === true ? editForm : null}
       </li>
@@ -71,9 +82,6 @@ export default class Task extends Component {
   }
 }
 
-Task.defaultProps = {
-  done: false,
-}
 
 Task.propTypes = {
   label: PropTypes.string.isRequired,

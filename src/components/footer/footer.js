@@ -2,7 +2,7 @@
 
 import PropTypes from 'prop-types'
 
-import TasksFilter from './tasks-filter'
+import TasksFilter from '../tasks-filter/tasks-filter'
 import './footer.css'
 
 export default function Footer({ todoLeftCount, onClearCompleted, ...filter }) {

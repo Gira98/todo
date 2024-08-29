@@ -2,9 +2,9 @@
 import { Component } from 'react'
 
 import { format } from 'date-fns'
-import TaskList from './task-list'
-import Footer from './footer'
-import NewTaskForm from './new-task-form'
+import TaskList from '../task-list/task-list'
+import Footer from '../footer/footer'
+import NewTaskForm from '../new-task-form/new-task-form'
 
 import './todo.css'
 
@@ -76,7 +76,8 @@ export default class Todo extends Component {
     this.setState({ activeFilter: button })
   }
 
-  getFilteredData = (todoData, activeFilter) => {
+  getFilteredData = (todoData) => {
+    const { activeFilter } = this.state;
     if (activeFilter === 'all') return todoData
     if (activeFilter === 'active') return todoData.filter((item) => !item.done)
     if (activeFilter === 'completed') return todoData.filter((item) => item.done)
@@ -102,7 +103,7 @@ export default class Todo extends Component {
       <div className="main">
         <NewTaskForm onItemAdded={this.addItem} />
         <TaskList
-          todos={this.getFilteredData(todoData, activeFilter)}
+          todos={this.getFilteredData(todoData)}
           onEdit={this.onEdit}
           onToggleDone={this.onToggleDone}
           onDelete={this.deleteItem}
