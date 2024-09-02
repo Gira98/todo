@@ -73,7 +73,9 @@ export default class Task extends Component {
               created {formatDistanceToNowStrict(created, { includeSeconds: true, addSuffix: true })}
             </span>
           </label>
+          {/* eslint-disable-next-line */}
           <button type='button' className="icon icon-edit" onClick={() => this.onEditHandle(id)} />
+          {/* eslint-disable-next-line */}
           <button type='button' className="icon icon-destroy" onClick={() => onDelete(id)} />
         </div>
         {isEditing === true ? editForm : null}

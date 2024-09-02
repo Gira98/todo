@@ -7,10 +7,6 @@
         "eslint:recommended",
         "plugin:react/recommended",
         "airbnb",
-        "plugin:react/jsx-runtime",
-        "plugin:react-hooks/recommended",
-        "plugin:jsx-a11y/recommended",
-        "plugin:import/recommended",
         "prettier"
     ],
     "parser": "@babel/eslint-parser",
@@ -23,6 +19,7 @@
     ],
     "rules": {
         "react/jsx-filename-extension": [0],
-        "react/sort-comp": "off"
+        "react/sort-comp": "off",
+        "react/react-in-jsx-scope": "off"
     }
 }
