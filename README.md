@@ -1,3 +1,5 @@
 todoApp
 
-Ссылка на развернутое приложение на Vercel https://todo-dun-eight-18.vercel.app/
+Ссылка на развернутое приложение на Vercel 
+
+https://todo-eed8b6xbd-giras-projects-be076ea0.vercel.app
