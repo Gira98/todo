@@ -18,7 +18,7 @@ TaskList.propTypes = {
       label: PropTypes.string.isRequired,
       id: PropTypes.number.isRequired,
       done: PropTypes.bool.isRequired,
-      created: PropTypes.instanceOf(Date).isRequired,
+      created: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
     })
   ).isRequired,
 

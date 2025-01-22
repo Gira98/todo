@@ -5,9 +5,9 @@ import './new-task-form.css'
 
 export default class NewTaskForm extends Component {
   constructor(props) {
-    super(props);
-    this.state = {label: ''};
-}
+    super(props)
+    this.state = { label: '', min: '', sec: '' }
+  }
 
   onLabelChange = (e) => {
     this.setState({
@@ -15,24 +15,46 @@ export default class NewTaskForm extends Component {
     })
   }
 
+  onMinChange = (e) => {
+    this.setState({
+      min: e.target.value,
+    })
+  }
+
+  onSecChange = (e) => {
+    this.setState({
+      sec: e.target.value,
+    })
+  }
+
+  static validation = (n) => {
+    if (n >= 0) {
+      return true
+    } 
+    return false
+  }
+
   onSubmit = (e) => {
-    const { label } = this.state
+    const { label, min, sec } = this.state
     const { onItemAdded } = this.props
     e.preventDefault()
-    if (!( label === '')) {
-      onItemAdded(label)
+
+    if (!(label === '') && NewTaskForm.validation(min) && NewTaskForm.validation(sec)) {
+      onItemAdded(label, min, sec)
       this.setState({
         label: '',
+        min: '',
+        sec: '',
       })
     }
   }
 
   render() {
-    const { label } = this.state
+    const { label, min, sec } = this.state
     return (
-      <form className="todoapp" onSubmit={this.onSubmit}>
-        <header className="header">
-          <h1>Todos</h1>
+      <header className="header">
+        <h1>Todos</h1>
+        <form className="new-todo-form" type="submit" onSubmit={this.onSubmit}>
           <input
             type="text"
             className="new-todo"
@@ -40,8 +62,14 @@ export default class NewTaskForm extends Component {
             onChange={this.onLabelChange}
             value={label}
           />
-        </header>
-      </form>
+          <input className="new-todo-form__timer" placeholder="Min" onChange={this.onMinChange} value={min} />
+          <input className="new-todo-form__timer" placeholder="Sec" onChange={this.onSecChange} value={sec} />
+
+          <button type="submit" style={{ display: 'none' }}>
+            Submit
+          </button>
+        </form>
+      </header>
     )
   }
 }

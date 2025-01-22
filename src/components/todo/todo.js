@@ -14,22 +14,24 @@ export default class Todo extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      todoData: [this.createTodoItem('Eat well'), this.createTodoItem('Study'), this.createTodoItem('Gym')],
+      todoData: [this.createTodoItem('Eat well', 10, 30), this.createTodoItem('Study', 45, 0), this.createTodoItem('Gym', 30, 0)],
       activeFilter: 'all',
     }
   }
 
-  createTodoItem(label) {
+  createTodoItem(label, min, sec) {
     return {
       label,
+      min,
+      sec,
       id: this.maxId++,
       done: false,
       created: format(new Date(), "yyyy-MM-dd'T'HH:mm:ss"),
     }
   }
 
-  addItem = (text) => {
-    const newItem = this.createTodoItem(text)
+  addItem = (text, min, sec) => {
+    const newItem = this.createTodoItem(text, min, sec)
     this.setState(({ todoData }) => {
       const newArr = [...todoData, newItem]
       return {
@@ -100,21 +102,23 @@ export default class Todo extends Component {
     const { todoData, activeFilter } = this.state
     const todoLeftCount = todoData.length - todoData.filter((el) => el.done).length
     return (
-      <div className="main">
-        <NewTaskForm onItemAdded={this.addItem} />
-        <TaskList
-          todos={this.getFilteredData(todoData)}
-          onEdit={this.onEdit}
-          onToggleDone={this.onToggleDone}
-          onDelete={this.deleteItem}
-        />
-        <Footer
-          todoLeftCount={todoLeftCount}
-          onClearCompleted={this.onClearCompleted}
-          activeFilter={activeFilter}
-          onFiltered={this.onFiltered}
-        />
-      </div>
+      <section className='todoapp'>
+        <div className="main">
+          <NewTaskForm onItemAdded={this.addItem} />
+          <TaskList
+            todos={this.getFilteredData(todoData)}
+            onEdit={this.onEdit}
+            onToggleDone={this.onToggleDone}
+            onDelete={this.deleteItem}
+          />
+          <Footer
+            todoLeftCount={todoLeftCount}
+            onClearCompleted={this.onClearCompleted}
+            activeFilter={activeFilter}
+            onFiltered={this.onFiltered}
+          />
+        </div>
+      </section>
     )
   }
 }
