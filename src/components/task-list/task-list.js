@@ -5,9 +5,16 @@ import PropTypes from 'prop-types'
 import Task from '../task/task'
 import './task-list.css'
 
-export default function TaskList({ todos, onToggleDone, onDelete, onEdit }) {
+export default function TaskList({ todos, onToggleDone, onDelete, onEdit, updateTask }) {
   const items = todos.map((todo) => (
-    <Task {...todo} key={todo.id} onToggleDone={onToggleDone} onDelete={onDelete} onEdit={onEdit} />
+    <Task
+      {...todo}
+      key={todo.id}
+      updateTask={updateTask}
+      onToggleDone={onToggleDone}
+      onDelete={onDelete}
+      onEdit={onEdit}
+    />
   ))
   return <ul className="todo-list">{items}</ul>
 }
@@ -18,11 +25,12 @@ TaskList.propTypes = {
       label: PropTypes.string.isRequired,
       id: PropTypes.number.isRequired,
       done: PropTypes.bool.isRequired,
-      created: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+      created: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     })
   ).isRequired,
 
   onDelete: PropTypes.func.isRequired,
   onToggleDone: PropTypes.func.isRequired,
   onEdit: PropTypes.func.isRequired,
+  updateTask: PropTypes.func.isRequired,
 }
