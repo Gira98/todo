@@ -1,77 +1,63 @@
-import { Component } from 'react'
+import { useState } from 'react'
 import PropTypes from 'prop-types'
 
 import './new-task-form.css'
 
-export default class NewTaskForm extends Component {
-  constructor(props) {
-    super(props)
-    this.state = { label: '', min: '', sec: '' }
+export default function NewTaskForm({ onItemAdded }) {
+  const [label, setLabel] = useState('')
+  const [min, setMin] = useState('')
+  const [sec, setSec] = useState('')
+
+  const onLabelChange = (e) => {
+    setLabel(e.target.value)
   }
 
-  onLabelChange = (e) => {
-    this.setState({
-      label: e.target.value,
-    })
+  const onMinChange = (e) => {
+    setMin(e.target.value)
   }
 
-  onMinChange = (e) => {
-    this.setState({
-      min: e.target.value,
-    })
+  const onSecChange = (e) => {
+    setSec(e.target.value)
   }
 
-  onSecChange = (e) => {
-    this.setState({
-      sec: e.target.value,
-    })
-  }
-
-  static validation = (n) => {
+  const validation = (n) => {
     if (n >= 0) {
       return true
-    } 
+    }
     return false
   }
 
-  onSubmit = (e) => {
-    const { label, min, sec } = this.state
-    const { onItemAdded } = this.props
+  const onSubmit = (e) => {
     e.preventDefault()
 
-    if (!(label === '') && NewTaskForm.validation(min) && NewTaskForm.validation(sec)) {
+    if (!(label === '') && validation(min) && validation(sec)) {
       onItemAdded(label, min, sec)
-      this.setState({
-        label: '',
-        min: '',
-        sec: '',
-      })
+      setLabel('')
+      setMin('')
+      setSec('')
     }
   }
 
-  render() {
-    const { label, min, sec } = this.state
-    return (
-      <header className="header">
-        <h1>Todos</h1>
-        <form className="new-todo-form" type="submit" onSubmit={this.onSubmit}>
-          <input
-            type="text"
-            className="new-todo"
-            placeholder="What needs to be done?"
-            onChange={this.onLabelChange}
-            value={label}
-          />
-          <input className="new-todo-form__timer" placeholder="Min" onChange={this.onMinChange} value={min} />
-          <input className="new-todo-form__timer" placeholder="Sec" onChange={this.onSecChange} value={sec} />
+  return (
+    <header className="header">
+      <h1>Todos</h1>
+      <form className="new-todo-form" type="submit" onSubmit={onSubmit}>
+        <input
+          type="text"
+          className="new-todo"
+          placeholder="What needs to be done?"
+          onChange={onLabelChange}
+          value={label}
+        />
+        <input className="new-todo-form__timer" placeholder="Min" onChange={onMinChange} value={min} />
+        <input className="new-todo-form__timer" placeholder="Sec" onChange={onSecChange} value={sec} />
 
-          <button type="submit" style={{ display: 'none' }}>
-            Submit
-          </button>
-        </form>
-      </header>
-    )
-  }
+        <button type="submit" style={{ display: 'none' }}>
+          Submit
+        </button>
+      </form>
+    </header>
+  )
 }
 
 NewTaskForm.propTypes = {

@@ -2,47 +2,62 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 
-import { Component, createRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import './task.css'
 
 import { formatDistanceToNowStrict } from 'date-fns'
 
-export default class Task extends Component {
-  constructor(props) {
-    super(props)
-    const { label } = this.props
+export default function Task({
+  label,
+  totalSec,
+  isTimerRunning,
+  id,
+  updateTask,
+  onEdit,
+  done,
+  created,
+  onToggleDone,
+  onDelete,
+}) {
+  const [isEditing, setIsEditing] = useState(false)
+  const [inputText, setInputText] = useState(label)
 
-    this.inputEl = createRef()
+  const inputEl = useRef(null)
+  const timer = useRef(0)
+  const savedCallback = useRef()
 
-    this.timer = null
-
-    this.state = {
-      isEditing: false,
-      inputText: label,
-    }
-  }
-
-  startTimer = () => {
-    const { totalSec, isTimerRunning, id, updateTask } = this.props
-
-    if (!isTimerRunning && totalSec > 0) {
-      updateTask(id, { isTimerRunning: true })
-
-      this.timer = setInterval(this.countDown, 1000)
-    }
-  }
-
-  pauseTimer = () => {
-    const { isTimerRunning, id, updateTask } = this.props
-
+  const pauseTimer = () => {
     if (isTimerRunning) {
-      clearInterval(this.timer)
+      clearInterval(timer.current)
+      timer.current = 0
       updateTask(id, { isTimerRunning: false })
     }
   }
 
-  static secondsToTime(sec) {
+  function countDown() {
+    if (totalSec > 0) {
+      updateTask(id, {
+        totalSec: totalSec - 1,
+      })
+    } else {
+      pauseTimer()
+    }
+  }
+
+  function callback() {
+    savedCallback.current()
+  }
+
+  const startTimer = () => {
+    if (!isTimerRunning && totalSec > 0) {
+      updateTask(id, { isTimerRunning: true })
+
+      timer.current = setInterval(callback, 1000)
+    }
+  }
+
+  function secondsToTime(sec) {
     const minutes = Math.floor(sec / 60)
     const seconds = sec % 60
 
@@ -53,134 +68,104 @@ export default class Task extends Component {
     return obj
   }
 
-  countDown = () => {
-    const { id, updateTask, totalSec } = this.props
-
-    if (totalSec > 0) {
-      updateTask(id, {
-        totalSec: totalSec - 1,
-      })
-    } else {
-      this.pauseTimer()
+  useEffect(() => {
+    if (isTimerRunning && !timer.current) {
+      timer.current = setInterval(callback, 1000)
     }
-  }
 
-  componentDidUpdate() {
-    if (this.inputEl.current) {
-      this.inputEl.current.focus()
+    return () => {
+      clearInterval(timer.current)
+      timer.current = 0
     }
-  }
+  }, [])
 
-  componentDidMount() {
-    const { isTimerRunning } = this.props
+  useEffect(() => {
+    savedCallback.current = countDown
 
-    if (isTimerRunning && !this.timer) {
-      this.timer = setInterval(this.countDown, 1000)
+    if (inputEl.current) {
+      inputEl.current.focus()
     }
+  })
+
+  const onEditHandle = () => {
+    setIsEditing(!isEditing)
   }
 
-  componentWillUnmount() {
-    clearInterval(this.timer)
+  const onInputChange = (e) => {
+    setInputText(e.target.value)
   }
 
-  onEditHandle = () => {
-    const { isEditing } = this.state
-    this.setState({
-      isEditing: !isEditing,
-    })
-  }
-
-  onInputChange = (e) => {
-    this.setState({
-      inputText: e.target.value,
-    })
-  }
-
-  onKeyPress = (e) => {
-    const { onEdit, id } = this.props
-
+  const onKeyPress = (e) => {
     if (e.key === 'Enter' && e.target.value.trim() !== '') {
       onEdit(id, e.target.value)
-      this.setState({
-        isEditing: false,
-      })
+      setIsEditing(false)
     }
     if (e.key === 'Enter' && e.target.value.trim() === '') {
-      this.setState({
-        isEditing: false,
-      })
+      setIsEditing(false)
     }
 
     if (e.key === 'Escape') {
-      this.setState({
-        isEditing: false,
-      })
+      setIsEditing(false)
     }
   }
 
-  onBlur = () => {
-    this.setState({
-      isEditing: false,
-    })
+  const onBlur = () => {
+    setIsEditing(false)
   }
 
-  render() {
-    const { label, id, done, created, onToggleDone, onDelete, totalSec } = this.props
-    const time = Task.secondsToTime(totalSec)
+  const time = secondsToTime(totalSec)
 
-    const { isEditing, inputText } = this.state
-    const editForm = (
-      <input
-        type="text"
-        className="edit"
-        onChange={this.onInputChange}
-        onKeyDown={this.onKeyPress}
-        onBlur={this.onBlur}
-        value={inputText}
-        ref={this.inputEl}
-      />
-    )
-    const liClassForm = () => {
-      if (isEditing) return 'editing'
-      if (done) return 'completed'
-      return ''
-    }
-
-    const onDeleteHandle = () => {
-      onDelete(id)
-      this.pauseTimer()
-    }
-
-    if (done) {
-      this.pauseTimer()
-    }
-
-    return (
-      <li className={liClassForm()}>
-        <div className="view">
-          <input className="toggle" type="checkbox" checked={done} onChange={() => onToggleDone(id)} />
-          <label>
-            <span className="title" onClick={() => onToggleDone(id)}>
-              {label}
-            </span>
-            <span className="description">
-              <button type="button" className="icon icon-play" onClick={this.startTimer} aria-label="Start Timer" />
-              <button type="button" className="icon icon-pause" onClick={this.pauseTimer} aria-label="Pause Timer" />
-              {`${time.m < 10 ? `0${time.m}` : time.m}:${time.s < 10 ? `0${time.s}` : time.s}`}
-            </span>
-
-            <span className="description">
-              created {formatDistanceToNowStrict(created, { includeSeconds: true, addSuffix: true })}
-            </span>
-          </label>
-
-          <button type="button" className="icon icon-edit" onClick={this.onEditHandle} aria-label="Edit task" />
-          <button type="button" className="icon icon-destroy" onClick={onDeleteHandle} aria-label="Delete task" />
-        </div>
-        {isEditing === true ? editForm : null}
-      </li>
-    )
+  const editForm = (
+    <input
+      type="text"
+      className="edit"
+      onChange={onInputChange}
+      onKeyDown={onKeyPress}
+      onBlur={onBlur}
+      value={inputText}
+      ref={inputEl}
+    />
+  )
+  const liClassForm = () => {
+    if (isEditing) return 'editing'
+    if (done) return 'completed'
+    return ''
   }
+
+  const onDeleteHandle = () => {
+    onDelete(id)
+    pauseTimer()
+  }
+
+  if (done) {
+    pauseTimer()
+  }
+
+  return (
+    <li className={liClassForm()}>
+      <div className="view">
+        <input className="toggle" type="checkbox" checked={done} onChange={() => onToggleDone(id)} />
+        <label>
+          <span className="title" onClick={() => onToggleDone(id)}>
+            {label}
+          </span>
+          <span className="description">
+            <button type="button" className="icon icon-play" onClick={startTimer} aria-label="Start Timer" />
+            <button type="button" className="icon icon-pause" onClick={pauseTimer} aria-label="Pause Timer" />
+            {`${time.m < 10 ? `0${time.m}` : time.m}:${time.s < 10 ? `0${time.s}` : time.s}`}
+          </span>
+
+          <span className="description">
+            created {formatDistanceToNowStrict(created, { includeSeconds: true, addSuffix: true })}
+          </span>
+        </label>
+
+        <button type="button" className="icon icon-edit" onClick={onEditHandle} aria-label="Edit task" />
+        <button type="button" className="icon icon-destroy" onClick={onDeleteHandle} aria-label="Delete task" />
+      </div>
+      {isEditing === true ? editForm : null}
+    </li>
+  )
 }
 
 Task.propTypes = {
